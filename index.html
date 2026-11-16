@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mosaïque — du dessin à la grille de crochet</title>
+<meta name="description" content="Dessiner un motif et obtenir la grille à suivre pour le crocheter en mosaïque. Les brides se placent toutes seules.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cap555">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Mosaïque">
+<meta property="og:description" content="Dessiner un motif et obtenir la grille à suivre pour le crocheter en mosaïque. Les brides se placent toutes seules.">
+<meta property="og:url" content="https://mosaique-crochet.cap555.eu/">
+<meta property="og:image" content="https://mosaique-crochet.cap555.eu/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mosaïque — du dessin à la grille de crochet">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF5EA">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121228">
+<style>
+:root {
+  --bg: #faf5ea;
+  --card: #fffdf6;
+  --ink: #2c2733;
+  --muted: #6f6678;
+  --line: #e3d9c8;
+  --accent1: #f5c400;
+  --accent2: #f07800;
+  --accent3: #d42a2a;
+  --err: #d41f1f;
+  --fix: #e07c00;
+  --ok: #1e7d4f;
+  --cv-grid: rgba(60,50,40,.18);
+  --cv-grid-strong: rgba(60,50,40,.45);
+  --cv-num: #6f6678;
+}
+html[data-theme="dark"] {
+  --bg: #121228;
+  --card: #1c1c38;
+  --ink: #efeaf6;
+  --muted: #a99fc0;
+  --line: #34305a;
+  --cv-grid: rgba(255,255,255,.14);
+  --cv-grid-strong: rgba(255,255,255,.38);
+  --cv-num: #a99fc0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: system-ui, sans-serif;
+  background: var(--bg); color: var(--ink);
+}
+html[data-theme="dark"] body {
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, #9db8ff99 50%, transparent 60%),
+    radial-gradient(1px 1px at 38% 6%, #9db8ff77 50%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 61% 27%, #9db8ff88 50%, transparent 60%),
+    radial-gradient(1px 1px at 83% 11%, #9db8ff66 50%, transparent 60%),
+    radial-gradient(1px 1px at 25% 48%, #9db8ff55 50%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 72% 58%, #9db8ff77 50%, transparent 60%),
+    radial-gradient(1px 1px at 48% 76%, #9db8ff66 50%, transparent 60%),
+    radial-gradient(1px 1px at 90% 83%, #9db8ff88 50%, transparent 60%),
+    radial-gradient(1.5px 1.5px at 8% 88%, #9db8ff66 50%, transparent 60%);
+  background-attachment: fixed;
+}
+header {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 6px 12px; border-bottom: 1px solid var(--line); background: var(--card);
+}
+header h1 {
+  margin: 0; font-size: 1.15rem;
+  background: linear-gradient(120deg, var(--accent1), var(--accent2), var(--accent3));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+header input#projName {
+  flex: 1; min-width: 140px; max-width: 320px;
+  padding: 5px 9px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--bg); color: var(--ink); font: inherit;
+}
+nav { display: flex; gap: 6px; padding: 6px 12px 0; }
+nav button {
+  padding: 6px 14px; border: 1px solid var(--line); border-bottom: none;
+  border-radius: 10px 10px 0 0; background: var(--card); color: var(--muted);
+  font: inherit; cursor: pointer;
+}
+nav button.on {
+  color: #3a2a00; background: linear-gradient(120deg, var(--accent1), var(--accent2));
+  border-color: transparent; font-weight: 600;
+}
+main { padding: 8px 12px 30px; }
+.tab { display: none; }
+.tab.on { display: block; }
+.panel {
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  padding: 7px 10px; margin-bottom: 8px;
+}
+.panel h2 { margin: 0 0 8px; font-size: .82rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.rowflex { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.rowflex + .rowflex { margin-top: 8px; }
+label { font-size: .9rem; }
+input[type="number"], select {
+  width: 70px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--bg); color: var(--ink); font: inherit;
+}
+select { width: auto; }
+button.act {
+  padding: 7px 12px; border: 1px solid var(--line); border-radius: 9px;
+  background: var(--bg); color: var(--ink); font: inherit; cursor: pointer;
+}
+button.act:hover { border-color: var(--accent2); }
+button.prime {
+  background: linear-gradient(120deg, var(--accent1), var(--accent2));
+  color: #3a2a00; border-color: transparent; font-weight: 600;
+}
+#palette { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.sw {
+  width: 34px; height: 34px; border-radius: 10px; cursor: pointer;
+  border: 3px solid transparent; box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+  padding: 0;
+}
+.sw.on { border-color: var(--ink); transform: scale(1.06); }
+.sw.add {
+  background: var(--bg); color: var(--muted); font-size: 1.3rem; line-height: 1;
+  border: 2px dashed var(--line);
+}
+.cwrap {
+  overflow: auto; max-height: calc(100vh - 185px); min-height: 300px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--card);
+}
+canvas { display: block; touch-action: none; }
+.status { margin-top: 8px; font-size: .92rem; }
+.status.err { color: var(--err); }
+.status.fix { color: var(--fix); }
+.status.ok { color: var(--ok); }
+.legend { font-size: .92rem; line-height: 1.55; }
+.legend b.sym { font-size: 1.05rem; }
+.hint { font-size: .82rem; color: var(--muted); }
+#aide { max-width: 760px; line-height: 1.6; }
+#aide h3 { margin: 18px 0 6px; }
+#printArea { display: none; }
+@media print {
+  body > header, body > nav, body > main { display: none !important; }
+  #printArea { display: block; font-family: system-ui, sans-serif; color: #000; }
+  #printArea img { max-width: 100%; }
+  #printArea i { display: inline-block; width: 14px; height: 14px; border: 1px solid #000; vertical-align: -2px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Mosaïque</h1>
+  <input id="projName" value="Mon motif" aria-label="Nom du projet">
+  <button class="act" id="themeBtn" title="Clair / sombre">🌙</button>
+</header>
+<nav>
+  <button data-tab="dessin" class="on">Dessin</button>
+  <button data-tab="grille">Grille de lecture</button>
+  <button data-tab="aide">Aide</button>
+</nav>
+<main>
+
+<section class="tab on" id="tab-dessin">
+  <div class="panel">
+    <div class="rowflex">
+      <button class="sw on" id="penA" title="Fond — re-clic : changer sa couleur"></button>
+      <button class="sw" id="penB" title="Motif — re-clic : changer sa couleur"></button>
+      <input type="color" id="colPick" style="position:absolute;opacity:0;width:0;height:0;border:0;padding:0">
+      <span style="width:8px"></span>
+      <button class="act" id="btnZo1" title="Réduire (ou Ctrl + molette sur la grille)">−</button>
+      <input type="range" id="inZoom" min="4" max="34" value="14" style="vertical-align:middle;width:90px" title="Zoom">
+      <button class="act" id="btnZi1" title="Agrandir (ou Ctrl + molette sur la grille)">+</button>
+      <span style="width:8px"></span>
+      <button class="act" id="btnUndo" title="Annuler le dernier geste (Ctrl+Z)">⟲ Annuler</button>
+      <button class="act" id="btnSwap" title="Inverse le motif : les brides deviennent fond et inversement.">Inverser</button>
+      <button class="act" id="btnClear" title="Repartir d’une grille entièrement vierge">Grille vierge</button>
+      <span style="width:8px"></span>
+      <label>Largeur <input type="number" id="inW" min="5" max="200" value="31" style="width:58px"></label>
+      <label>Hauteur <input type="number" id="inH" min="5" max="300" value="39" style="width:58px"></label>
+      <button class="act" id="btnResize">Redimensionner</button>
+    </div>
+  </div>
+  <div class="cwrap"><canvas id="cvDraw"></canvas></div>
+  <div class="status" id="stDraw">Choisis fond ou motif ci-dessus, puis clique ou glisse sur les cases : chaque carré se colore aussitôt. Les pastilles à gauche de la grille donnent le fil de chaque rang — clique-en une pour changer la teinte de ce rang.</div>
+
+  <div class="panel" style="margin-top:12px">
+    <h2>Vérification des règles</h2>
+    <div class="rowflex">
+      <label>Quand le dessin est impossible à crocheter :
+        <select id="selVal">
+          <option value="auto">corriger automatiquement</option>
+          <option value="signal">signaler seulement</option>
+        </select>
+      </label>
+      <button class="act prime" id="btnCheck">Vérifier maintenant</button>
+    </div>
+    <div class="status" id="stVal"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Importer une image</h2>
+    <div class="rowflex">
+      <input type="file" id="inFile" accept="image/*">
+      <label>Largeur cible <input type="number" id="inImgW" min="5" max="200" value="31"></label>
+      <label>Seuil <input type="range" id="inSeuil" min="1" max="254" value="128" style="vertical-align:middle"></label>
+      <label><input type="checkbox" id="inImgInv"> inverser</label>
+      <button class="act prime" id="btnImgApply" disabled>Appliquer à la grille</button>
+    </div>
+    <canvas id="cvPrev" style="margin-top:8px;border:1px solid var(--line);border-radius:8px;max-width:100%"></canvas>
+    <div class="hint">L’image est réduite à 2 couleurs : clair = fond, foncé = motif. Ajuste le seuil puis applique.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Projet</h2>
+    <div class="rowflex">
+      <button class="act" id="btnSave">Enregistrer (fichier .json)</button>
+      <input type="file" id="inLoad" accept="application/json">
+      <span class="hint">Sauvegarde automatique dans le navigateur à chaque geste.</span>
+    </div>
+  </div>
+</section>
+
+<section class="tab" id="tab-grille">
+  <div class="panel">
+    <div class="rowflex">
+      <select id="selTech" title="Techniques">
+        <optgroup label="Techniques">
+          <option value="simple">Overlay — simple face (X)</option>
+          <option value="rev">Overlay — réversible (X et O)</option>
+          <option value="inset">Inset — aller-retour</option>
+        </optgroup>
+      </select>
+      <span style="width:12px"></span>
+      <label>Rang en cours <input type="number" id="inMarker" min="1" value="1"></label>
+      <button class="act" id="btnMarkDown">▼</button>
+      <button class="act" id="btnMarkUp">▲</button>
+      <span style="width:10px"></span>
+      <button class="act" id="btnZo2" title="Réduire (ou Ctrl + molette sur la grille)">−</button>
+      <button class="act" id="btnZi2" title="Agrandir (ou Ctrl + molette sur la grille)">+</button>
+      <button class="act" id="btnPrint">Imprimer</button>
+    </div>
+  </div>
+  <div class="status err" id="stGrille" style="margin-bottom:8px"></div>
+  <div class="cwrap"><canvas id="cvChart"></canvas></div>
+  <div class="hint" style="margin-top:6px">Clique sur un rang pour y poser le marqueur. Les rangs déjà faits (sous le marqueur) sont estompés.</div>
+</section>
+
+<section class="tab" id="tab-aide">
+  <div id="aide">
+    <h3>Choisir les couleurs et zoomer</h3>
+    <p>Deux pastilles en haut de l’onglet Dessin : <b>fond</b> et <b>motif</b>. Clique l’une pour peindre avec,
+    puis clique ou glisse sur les cases : chaque carré se colore aussitôt. Re-clique la pastille déjà choisie
+    pour lui donner une nouvelle couleur : <b>elle s’ajoute au pinceau sans rien changer à l’ouvrage</b>,
+    et entre dans le dessin au fur et à mesure que tu peins. Comme un rang se crochète avec un seul fil,
+    la teinte peinte vaut pour tout ce fil sur ce rang-là — jamais au-delà.
+    C’est la distinction fond/motif qui sert au calcul des points — les teintes ne sont qu’un habillage,
+    mémorisé rang par rang.</p>
+    <p>Pour ajuster une teinte sans repeindre : clique la <b>pastille à gauche d’un rang</b> le long de la
+    grille — le changement vaut pour ce rang seulement.</p>
+    <p><b>Zoom</b> : le curseur, les boutons − / +, ou <b>Ctrl + molette</b> de la souris sur la grille —
+    dans le dessin comme dans la grille de lecture.</p>
+
+    <h3>Les règles appliquées par l’appli</h3>
+    <p><b>Overlay</b> (une couleur par rang, fil coupé en fin de rang, toujours sur l’endroit) :
+    les rangs alternent fil A et fil B. Case sans symbole = maille serrée dans le brin arrière.
+    <b class="sym">X</b> = bride piquée dans le brin avant de la maille <i>2 rangs plus bas</i> (même couleur) ;
+    elle recouvre la case juste en dessous. La première et la dernière maille de chaque rang sont des
+    mailles de bord (ms sous les deux brins, jamais de X) : l’appli les ajoute toute seule autour de ton dessin,
+    avec la lettre A ou B du fil du rang, comme sur tes grilles du Cerf.</p>
+    <p>D’où les règles de validité que l’appli vérifie :
+    une case qui montre l’autre couleur que celle de son rang doit avoir, juste au-dessous et juste au-dessus,
+    une case de cette même couleur (la bride a besoin d’un ancrage libre dessous et sa tête occupe la case dessus).
+    Le rang 1 et le dernier rang ne peuvent montrer que la couleur de leur propre fil.
+    Conséquence connue : jamais deux X l’un au-dessus de l’autre, et le premier X possible est au rang 3.</p>
+    <p><b>Réversible</b> : d’après « The basics of overlay mosaic crochet » de Claire Musson (dans ton dossier
+    Mosaïque), le point négatif — ton <b class="sym">O</b>, noté R chez elle — se travaille
+    <i>au rang juste au-dessus et derrière chaque X</i> : on pique le crochet de haut en bas dans le brin arrière
+    de la bride et dans le brin arrière de la ms sautée 2 rangs plus bas, à l’arrière de l’ouvrage.
+    L’appli place donc un O au-dessus de chaque X, automatiquement. Un X sur le dernier rang n’a pas de rang
+    au-dessus pour son O : son envers restera rayé à cet endroit.</p>
+    <p><b>Inset</b> (aller-retour, sans couper) : chaque ligne de la grille vaut deux rangs (aller sur l’endroit,
+    retour sur l’envers), deux rangs par couleur. Case de la couleur du rang = maille serrée ;
+    case de l’autre couleur = « 1 ml, sauter 1 maille » ; au passage suivant de l’autre couleur,
+    <b class="sym">X</b> = bride piquée dans la maille sautée 3 rangs plus bas, qui remplit la fenêtre.
+    Les règles de validité sont les mêmes que pour l’overlay.</p>
+
+    <h3>Le marqueur de rang</h3>
+    <p>Dans la grille de lecture, clique un rang (ou utilise ▲▼). Les rangs faits s’estompent.
+    La position est retenue d’une visite à l’autre.</p>
+
+    <h3>Sources vérifiées</h3>
+    <p class="hint">Claire Musson, « The basics of overlay mosaic crochet » (BasicsReverseBorder.pdf) ·
+    hanjancrochet.com (lecture des grilles, technique inset) · gyho.co.uk (technique) ·
+    tes grilles Cerf1SimpleFace / Cerf1Reversible (convention X / O, lettres A-B, numérotation).</p>
+  </div>
+</section>
+
+</main>
+<div id="printArea"></div>
+
+<script>
+"use strict";
+window.__bootError = null;
+window.onerror = (m, src, l, col) => { if (!window.__bootError) window.__bootError = m + " @" + l + ":" + col; };
+
+const $ = id => document.getElementById(id);
+const LS = "mosaique-cap555-v1";
+const S = {
+  name: "Mon motif",
+  W: 31, H: 39,
+  cells: null,            // 0 = fil A, 1 = fil B ; rang 1 = bas
+  yarns: null,            // couleur du fil de chaque rang, index 0 = rang 1
+  penA: null, penB: null, // couleurs des deux pinceaux (fond, motif)
+  tech: "simple",
+  valMode: "auto",
+  marker: 1,
+  zoom: 14,
+  theme: null
+};
+let undoStack = [], flash = { kind: null, set: new Set() };
+
+const idx = (r, c) => (r - 1) * S.W + (c - 1);
+const rowYarn = r => (r % 2 === 1 ? 0 : 1);          // rang impair = fil A
+const off = (r, c) => S.cells[idx(r, c)] !== rowYarn(r);
+const yarnColor = r => S.yarns[r - 1];
+const coverColor = r => (r < S.H ? S.yarns[r] : (S.H > 1 ? S.yarns[r - 2] : S.yarns[0]));
+const tint = (r, v) => (v === rowYarn(r) ? yarnColor(r) : coverColor(r));
+const norm = c => String(c).toLowerCase();
+
+function defaultYarns(H, A, B) {
+  return Array.from({ length: H }, (_, i) => ((i + 1) % 2 === 1 ? A : B));
+}
+function contrast(hex) {
+  const n = parseInt(String(hex).slice(1), 16) || 0;
+  return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 > 150 ? "#1c1826" : "#fdfbf5";
+}
+
+/* ---------- règles ---------- */
+function violations() {
+  const v = [];
+  for (let r = 1; r <= S.H; r++) for (let c = 1; c <= S.W; c++) {
+    if (!off(r, c)) continue;
+    if (r === 1) v.push([r, c, "le rang 1 ne peut montrer que la couleur de son fil"]);
+    else if (r === S.H) v.push([r, c, "le dernier rang ne peut pas être recouvert (aucune bride au-dessus)"]);
+    else {
+      if (off(r - 1, c)) v.push([r, c, "la case au-dessous doit être de la même couleur (ancrage de la bride)"]);
+      if (off(r + 1, c)) v.push([r, c, "la case au-dessus doit être de la même couleur (tête de la bride)"]);
+    }
+  }
+  return v;
+}
+function autoFix() {
+  const changed = [];
+  for (let r = 1; r <= S.H; r++) for (let c = 1; c <= S.W; c++) {
+    if (off(r, c) && (r === 1 || r === S.H || off(r - 1, c))) {
+      S.cells[idx(r, c)] = rowYarn(r);
+      changed.push(r + "," + c);
+    }
+  }
+  return changed;
+}
+const isX = (r, c) => r >= 2 && off(r - 1, c);
+const isO = (r, c) => S.tech === "rev" && r >= 2 && isX(r - 1, c);
+
+/* ---------- couleurs : deux pinceaux + pastilles de rang ---------- */
+let pen = 0;            // 0 = fond, 1 = motif
+let pickTarget = null;  // "penA" | "penB" | numéro de rang
+function renderPens() {
+  $("penA").style.background = S.penA; $("penB").style.background = S.penB;
+  $("penA").classList.toggle("on", pen === 0);
+  $("penB").classList.toggle("on", pen === 1);
+}
+function openPick(target, init) {
+  pickTarget = target;
+  $("colPick").value = init;
+  $("colPick").click();
+}
+$("penA").onclick = () => { if (pen === 0) openPick("penA", S.penA); pen = 0; renderPens(); };
+$("penB").onclick = () => { if (pen === 1) openPick("penB", S.penB); pen = 1; renderPens(); };
+$("colPick").oninput = $("colPick").onchange = () => {
+  const col = norm($("colPick").value);
+  if (pickTarget === "penA" || pickTarget === "penB") {
+    S[pickTarget] = col;          // la couleur s'ajoute au pinceau, rien ne change dans l'ouvrage
+  } else if (typeof pickTarget === "number") {
+    pushUndo();
+    S.yarns[pickTarget - 1] = col;
+    $("stDraw").textContent = "Fil du rang " + pickTarget + " changé (ce rang seulement).";
+  }
+  renderPens(); renderDraw(); saveLocal();
+};
+
+/* ---------- canvas dessin ---------- */
+const cvD = $("cvDraw"), xD = cvD.getContext("2d");
+const MG = { num: 22, chip: 16, t: 16, b: 24, r: 30 };
+const LEFT = MG.num + MG.chip + 4;
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function renderDraw() {
+  const z = S.zoom, w = LEFT + S.W * z + MG.r, h = MG.t + S.H * z + MG.b;
+  const dpr = window.devicePixelRatio || 1;
+  cvD.width = w * dpr; cvD.height = h * dpr;
+  cvD.style.width = w + "px"; cvD.style.height = h + "px";
+  xD.setTransform(dpr, 0, 0, dpr, 0, 0);
+  xD.clearRect(0, 0, w, h);
+  xD.textBaseline = "middle";
+  for (let r = 1; r <= S.H; r++) {
+    const y = MG.t + (S.H - r) * z;
+    for (let c = 1; c <= S.W; c++) {
+      xD.fillStyle = tint(r, S.cells[idx(r, c)]);
+      xD.fillRect(LEFT + (c - 1) * z, y, z, z);
+    }
+    // pastille du fil de ce rang
+    xD.fillStyle = yarnColor(r);
+    xD.fillRect(MG.num, y, MG.chip, z);
+    xD.strokeStyle = cssVar("--cv-grid-strong"); xD.lineWidth = 1;
+    xD.strokeRect(MG.num + .5, y + .5, MG.chip - 1, z - 1);
+  }
+  xD.strokeStyle = cssVar("--cv-grid-strong"); xD.lineWidth = 1;
+  xD.beginPath();
+  for (let c = 0; c <= S.W; c++) { const x = LEFT + c * z + .5; xD.moveTo(x, MG.t); xD.lineTo(x, MG.t + S.H * z); }
+  for (let r = 0; r <= S.H; r++) { const y = MG.t + r * z + .5; xD.moveTo(LEFT, y); xD.lineTo(LEFT + S.W * z, y); }
+  xD.stroke();
+  xD.fillStyle = cssVar("--cv-num");
+  xD.font = Math.max(6, Math.min(10, z - 4)) + "px system-ui";
+  for (let r = 1; r <= S.H; r++) {
+    const y = MG.t + (S.H - r) * z + z / 2;
+    xD.textAlign = "right"; xD.fillText(r, MG.num - 3, y);
+    xD.textAlign = "left"; xD.fillText(r, LEFT + S.W * z + 4, y);
+  }
+  xD.textAlign = "center";
+  for (let c = 1; c <= S.W; c++) {
+    const n = S.W - c + 1;
+    xD.fillText(n, LEFT + (c - 1) * z + z / 2, MG.t + S.H * z + 10);
+    xD.fillText(n, LEFT + (c - 1) * z + z / 2, MG.t / 2 + 1);
+  }
+  if (flash.kind) {
+    xD.lineWidth = 2;
+    xD.strokeStyle = flash.kind === "err" ? "#d41f1f" : "#e07c00";
+    for (const key of flash.set) {
+      const [r, c] = key.split(",").map(Number);
+      xD.strokeRect(LEFT + (c - 1) * S.zoom + 1, MG.t + (S.H - r) * S.zoom + 1, S.zoom - 2, S.zoom - 2);
+    }
+  }
+}
+function hitAt(ev) {
+  const rect = cvD.getBoundingClientRect();
+  const px = ev.clientX - rect.left, py = ev.clientY - rect.top;
+  const r = S.H - Math.floor((py - MG.t) / S.zoom);
+  if (r < 1 || r > S.H) return null;
+  if (px >= MG.num && px < MG.num + MG.chip) return { kind: "chip", r };
+  const c = Math.floor((px - LEFT) / S.zoom) + 1;
+  if (c < 1 || c > S.W) return null;
+  return { kind: "cell", r, c };
+}
+let painting = false, lastCell = null;
+cvD.addEventListener("pointerdown", ev => {
+  const hit = hitAt(ev); if (!hit) return;
+  ev.preventDefault();
+  flash.kind = null; flash.set.clear();
+  if (hit.kind === "chip") {
+    openPick(hit.r, yarnColor(hit.r));
+    return;
+  }
+  pushUndo();
+  painting = true; lastCell = [hit.r, hit.c];
+  try { cvD.setPointerCapture(ev.pointerId); } catch (e) {}
+  paintCell(hit.r, hit.c);
+  renderDraw(); saveLocal();
+});
+cvD.addEventListener("pointermove", ev => {
+  if (!painting) return;
+  const hit = hitAt(ev);
+  if (!hit || hit.kind !== "cell") return;
+  const [r0, c0] = lastCell, r1 = hit.r, c1 = hit.c;
+  const n = Math.max(Math.abs(r1 - r0), Math.abs(c1 - c0)) || 1;
+  for (let i = 1; i <= n; i++)
+    paintCell(Math.round(r0 + (r1 - r0) * i / n), Math.round(c0 + (c1 - c0) * i / n));
+  lastCell = [r1, c1];
+  renderDraw(); saveLocal();
+});
+addEventListener("pointerup", () => { painting = false; });
+function paintCell(r, c) {
+  if (r < 1 || r > S.H || c < 1 || c > S.W) return;
+  S.cells[idx(r, c)] = pen;
+  // la teinte du pinceau devient celle du fil concerné : celui du rang,
+  // ou celui du rang au-dessus quand la case est recouverte par lui
+  const col = pen === 0 ? S.penA : S.penB;
+  const tr = rowYarn(r) === pen ? r : r + 1;
+  if (tr <= S.H && norm(S.yarns[tr - 1]) !== norm(col)) S.yarns[tr - 1] = col;
+}
+
+/* ---------- undo ---------- */
+function pushUndo() {
+  undoStack.push({ W: S.W, H: S.H, cells: S.cells.slice(), yarns: S.yarns.slice() });
+  if (undoStack.length > 60) undoStack.shift();
+}
+$("btnUndo").onclick = () => {
+  const u = undoStack.pop(); if (!u) return;
+  S.W = u.W; S.H = u.H; S.cells = u.cells; S.yarns = u.yarns;
+  $("inW").value = S.W; $("inH").value = S.H;
+  flash.kind = null; flash.set.clear();
+  renderPens(); renderDraw(); saveLocal();
+};
+
+/* ---------- actions dessin ---------- */
+$("btnResize").onclick = () => {
+  const W = Math.max(5, Math.min(200, +$("inW").value || 31));
+  const H = Math.max(5, Math.min(300, +$("inH").value || 39));
+  pushUndo();
+  const nc = new Uint8Array(W * H);
+  for (let r = 1; r <= H; r++) for (let c = 1; c <= W; c++)
+    nc[(r - 1) * W + (c - 1)] = (r <= S.H && c <= S.W) ? S.cells[idx(r, c)] : (r % 2 === 1 ? 0 : 1);
+  const ny = Array.from({ length: H }, (_, i) =>
+    i < S.H ? S.yarns[i] : S.yarns[S.H - 2 + ((i - S.H) % 2)] || S.yarns[i % 2]);
+  S.W = W; S.H = H; S.cells = nc; S.yarns = ny;
+  $("inW").value = W; $("inH").value = H;
+  S.marker = Math.min(S.marker, H); $("inMarker").value = S.marker;
+  flash.set.clear(); flash.kind = null;
+  renderDraw(); saveLocal();
+};
+$("btnSwap").onclick = () => {
+  pushUndo();
+  for (let i = 0; i < S.cells.length; i++) S.cells[i] = 1 - S.cells[i];
+  renderDraw(); saveLocal();
+  $("stDraw").textContent = "Motif inversé : le fond devient le dessin et inversement.";
+};
+$("btnClear").onclick = () => {
+  pushUndo();
+  S.cells.fill(0);                                  // plus aucun motif
+  S.yarns = defaultYarns(S.H, S.penA, S.penB);      // plus aucune teinte de rang particulière
+  flash.set.clear(); flash.kind = null;
+  renderPens(); renderDraw(); saveLocal();
+};
+function setZoom(z) {
+  S.zoom = Math.max(4, Math.min(34, Math.round(z)));
+  $("inZoom").value = S.zoom;
+  renderDraw();
+  if (document.getElementById("tab-grille").classList.contains("on")) renderChart();
+  saveLocal();
+}
+$("inZoom").oninput = () => setZoom(+$("inZoom").value);
+$("btnZo1").onclick = () => setZoom(S.zoom - 2);
+$("btnZi1").onclick = () => setZoom(S.zoom + 2);
+$("btnZo2").onclick = () => setZoom(S.zoom - 2);
+$("btnZi2").onclick = () => setZoom(S.zoom + 2);
+addEventListener("keydown", ev => {
+  if (ev.ctrlKey && ev.key === "z") { ev.preventDefault(); $("btnUndo").click(); }
+});
+
+/* ---------- vérification ---------- */
+$("selVal").onchange = () => { S.valMode = $("selVal").value; saveLocal(); };
+$("btnCheck").onclick = () => runCheck();
+function runCheck() {
+  const v = violations();
+  const st = $("stVal");
+  if (!v.length) {
+    st.className = "status ok";
+    st.textContent = "Tout est crochetable : aucune case ne viole les règles.";
+    flash.kind = null; flash.set.clear(); renderDraw();
+    return true;
+  }
+  if (S.valMode === "auto") {
+    pushUndo();
+    const changed = autoFix();
+    st.className = "status fix";
+    st.textContent = changed.length + " case(s) corrigée(s) automatiquement (contour orange).";
+    flash.kind = "fix"; flash.set = new Set(changed);
+    renderDraw(); saveLocal();
+    return true;
+  }
+  st.className = "status err";
+  const uniq = new Set(v.map(e => e[0] + "," + e[1]));
+  st.textContent = uniq.size + " case(s) impossibles (contour rouge). Exemple — rang " + v[0][0] + ", maille " + v[0][1] + " : " + v[0][2] + ".";
+  flash.kind = "err"; flash.set = uniq;
+  renderDraw();
+  return false;
+}
+
+/* ---------- import image ---------- */
+let imgData = null;
+$("inFile").onchange = ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => { imgData = img; $("btnImgApply").disabled = false; renderPreview(); };
+  img.src = URL.createObjectURL(f);
+};
+$("inSeuil").oninput = renderPreview;
+$("inImgInv").onchange = renderPreview;
+$("inImgW").onchange = renderPreview;
+function imgGrid() {
+  const W = Math.max(5, Math.min(200, +$("inImgW").value || 31));
+  const H = Math.max(5, Math.min(300, Math.round(W * imgData.height / imgData.width)));
+  const cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext("2d");
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+  ctx.drawImage(imgData, 0, 0, W, H);
+  const d = ctx.getImageData(0, 0, W, H).data;
+  const seuil = +$("inSeuil").value, inv = $("inImgInv").checked;
+  const cells = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = (y * W + x) * 4;
+    const lum = d[i] * .2126 + d[i + 1] * .7152 + d[i + 2] * .0722;
+    let dark = lum < seuil ? 1 : 0;
+    if (inv) dark = 1 - dark;
+    const r = H - y;                       // ligne 0 de l'image = haut = rang H
+    // foncé = motif (couleur du fil B), clair = fond (fil A)
+    cells[(r - 1) * W + x] = dark ? 1 : 0;
+  }
+  return { W, H, cells };
+}
+function renderPreview() {
+  if (!imgData) return;
+  const { W, H, cells } = imgGrid();
+  const cv = $("cvPrev"), z = Math.max(2, Math.min(8, Math.floor(560 / W)));
+  cv.width = W * z; cv.height = H * z;
+  const ctx = cv.getContext("2d");
+  const A = S.yarns ? S.yarns[0] : "#f2ead8", B = S.yarns ? S.yarns[1] : "#d42a2a";
+  for (let r = 1; r <= H; r++) for (let c = 1; c <= W; c++) {
+    ctx.fillStyle = cells[(r - 1) * W + (c - 1)] ? B : A;
+    ctx.fillRect((c - 1) * z, (H - r) * z, z, z);
+  }
+}
+$("btnImgApply").onclick = () => {
+  if (!imgData) return;
+  pushUndo();
+  const g = imgGrid();
+  const A = S.yarns[0], B = S.yarns[1] || "#d42a2a";
+  S.W = g.W; S.H = g.H; S.cells = g.cells;
+  S.yarns = defaultYarns(g.H, A, B);
+  $("inW").value = g.W; $("inH").value = g.H;
+  S.marker = 1; $("inMarker").value = 1;
+  renderPens(); renderDraw(); runCheck(); saveLocal();
+};
+
+/* ---------- grille de lecture ---------- */
+const cvC = $("cvChart"), xC = cvC.getContext("2d");
+for (const cv of [cvD, cvC]) cv.addEventListener("wheel", ev => {
+  if (!ev.ctrlKey) return;
+  ev.preventDefault();
+  setZoom(S.zoom + (ev.deltaY < 0 ? 2 : -2));
+}, { passive: false });
+function renderChart() {
+  const st = $("stGrille");
+  if (violations().length) {
+    if (S.valMode === "auto") runCheck();
+    if (violations().length) {
+      st.textContent = "Le dessin contient des cases impossibles : reviens à l’onglet Dessin (elles sont entourées de rouge), ou passe en correction automatique.";
+      cvC.width = cvC.height = 0;
+      return;
+    }
+  }
+  st.textContent = "";
+  const z = Math.max(6, S.zoom), L = 2, NUM = 26, TOP = 16, BOT = 24;
+  const w = NUM + (S.W + L) * z + NUM, h = TOP + S.H * z + BOT;
+  const dpr = window.devicePixelRatio || 1;
+  cvC.width = w * dpr; cvC.height = h * dpr;
+  cvC.style.width = w + "px"; cvC.style.height = h + "px";
+  xC.setTransform(dpr, 0, 0, dpr, 0, 0);
+  xC.clearRect(0, 0, w, h);
+  xC.textAlign = "center"; xC.textBaseline = "middle";
+  for (let r = 1; r <= S.H; r++) {
+    const y = TOP + (S.H - r) * z, yc = y + z / 2;
+    const ycol = yarnColor(r);
+    xC.globalAlpha = r < S.marker ? .3 : 1;
+    for (const bx of [NUM, NUM + (S.W + 1) * z]) {
+      xC.fillStyle = ycol; xC.fillRect(bx, y, z, z);
+      xC.fillStyle = contrast(ycol);
+      xC.font = "bold " + Math.floor(z * .6) + "px system-ui";
+      xC.fillText(rowYarn(r) === 0 ? "A" : "B", bx + z / 2, yc + 1);
+    }
+    for (let c = 1; c <= S.W; c++) {
+      const x = NUM + c * z;
+      const col = tint(r, S.cells[idx(r, c)]);
+      xC.fillStyle = col; xC.fillRect(x, y, z, z);
+      const sy = isX(r, c) ? "X" : (isO(r, c) ? "O" : null);
+      if (sy) {
+        xC.strokeStyle = contrast(col); xC.lineWidth = Math.max(1.4, z / 9);
+        const p = z * .26;
+        xC.beginPath();
+        if (sy === "X") {
+          xC.moveTo(x + p, y + p); xC.lineTo(x + z - p, y + z - p);
+          xC.moveTo(x + z - p, y + p); xC.lineTo(x + p, y + z - p);
+        } else xC.arc(x + z / 2, yc, z / 2 - p, 0, 7);
+        xC.stroke();
+      }
+    }
+    xC.globalAlpha = 1;
+    xC.fillStyle = cssVar("--cv-num"); xC.font = "10px system-ui";
+    const lab = S.tech === "inset" ? r + "·" + r + "a" : String(r);
+    xC.fillText(lab, NUM / 2, yc); xC.fillText(lab, w - NUM / 2, yc);
+  }
+  xC.strokeStyle = cssVar("--cv-grid-strong"); xC.lineWidth = 1; xC.beginPath();
+  for (let c = 0; c <= S.W + L; c++) { const x = NUM + c * z + .5; xC.moveTo(x, TOP); xC.lineTo(x, TOP + S.H * z); }
+  for (let r = 0; r <= S.H; r++) { const y = TOP + r * z + .5; xC.moveTo(NUM, y); xC.lineTo(NUM + (S.W + L) * z, y); }
+  xC.stroke();
+  const my = TOP + (S.H - S.marker) * z;
+  xC.strokeStyle = cssVar("--accent2") || "#f07800"; xC.lineWidth = 3;
+  xC.strokeRect(NUM - 1.5, my - 1.5, (S.W + L) * z + 3, z + 3);
+  xC.fillStyle = cssVar("--cv-num"); xC.font = Math.max(6, Math.min(10, z - 4)) + "px system-ui";
+  for (let c = 1; c <= S.W; c++) {
+    const n = S.W - c + 1;
+    xC.fillText(n, NUM + c * z + z / 2, TOP + S.H * z + 12);
+    xC.fillText(n, NUM + c * z + z / 2, TOP / 2 + 2);
+  }
+}
+cvC.addEventListener("pointerdown", ev => {
+  const rect = cvC.getBoundingClientRect();
+  const r = S.H - Math.floor((ev.clientY - rect.top - 16) / Math.max(6, S.zoom));
+  if (r >= 1 && r <= S.H) { S.marker = r; $("inMarker").value = r; renderChart(); saveLocal(); }
+});
+$("inMarker").onchange = () => { S.marker = Math.max(1, Math.min(S.H, +$("inMarker").value || 1)); $("inMarker").value = S.marker; renderChart(); saveLocal(); };
+$("btnMarkUp").onclick = () => { S.marker = Math.min(S.H, S.marker + 1); $("inMarker").value = S.marker; renderChart(); saveLocal(); };
+$("btnMarkDown").onclick = () => { S.marker = Math.max(1, S.marker - 1); $("inMarker").value = S.marker; renderChart(); saveLocal(); };
+$("selTech").onchange = () => { S.tech = $("selTech").value; renderChart(); saveLocal(); };
+
+/* ---------- impression ---------- */
+$("btnPrint").onclick = () => {
+  const keep = S.zoom;
+  S.zoom = 22; renderChart();
+  const url = cvC.toDataURL("image/png");
+  S.zoom = keep; renderChart();
+  const seen = [];
+  for (let r = 1; r <= S.H; r++) {
+    const last = seen[seen.length - 1];
+    if (!last || norm(last.col) !== norm(yarnColor(r))) seen.push({ col: yarnColor(r), from: r, to: r });
+    else last.to = r;
+  }
+  const fils = seen.map(s => "<i style='background:" + s.col + "'></i> " + s.col +
+    " — rang" + (s.from === s.to ? " " + s.from : "s " + s.from + "–" + s.to)).join(" · ");
+  $("printArea").innerHTML =
+    "<h2>" + S.name.replace(/</g, "&lt;") + "</h2>" +
+    "<p style='font-size:.85rem'>Fils : " + fils + "</p>" +
+    "<img src='" + url + "'>";
+  setTimeout(() => window.print(), 60);
+};
+
+/* ---------- projet ---------- */
+function snapshot() {
+  return {
+    app: "mosaique-cap555", version: 2,
+    name: S.name, W: S.W, H: S.H,
+    rows: Array.from({ length: S.H }, (_, r) =>
+      Array.from({ length: S.W }, (_, c) => S.cells[r * S.W + c]).join("")),
+    yarns: S.yarns, penA: S.penA, penB: S.penB,
+    tech: S.tech, valMode: S.valMode,
+    marker: S.marker, zoom: S.zoom, theme: S.theme
+  };
+}
+function restore(d) {
+  S.name = d.name || "Mon motif"; S.W = d.W; S.H = d.H;
+  S.cells = new Uint8Array(S.W * S.H);
+  d.rows.forEach((row, r) => { for (let c = 0; c < S.W; c++) S.cells[r * S.W + c] = +row[c]; });
+  if (d.yarns && d.yarns.length === S.H) S.yarns = d.yarns.slice();
+  else {                                   // ancien format : zones -> couleur par rang
+    const zones = (d.zones && d.zones.length) ? d.zones.slice().sort((a, b) => a.from - b.from)
+                                             : [{ from: 1, A: "#f2ead8", B: "#d42a2a" }];
+    S.yarns = Array.from({ length: S.H }, (_, i) => {
+      const r = i + 1;
+      let z = zones[0];
+      for (const zz of zones) if (zz.from <= r) z = zz;
+      let col = r % 2 === 1 ? z.A : z.B;
+      return norm(col) === "#3f6bd8" ? "#d42a2a" : col;   // ancien bleu par défaut
+    });
+  }
+  S.penA = d.penA || S.yarns[0];
+  S.penB = d.penB || S.yarns[1] || "#d42a2a";
+  S.tech = d.tech || "simple";
+  S.valMode = d.valMode || "auto"; S.marker = d.marker || 1;
+  S.zoom = d.zoom || 14; S.theme = d.theme || null;
+}
+let saveT = null;
+function saveLocal() {
+  clearTimeout(saveT);
+  saveT = setTimeout(() => { try { localStorage.setItem(LS, JSON.stringify(snapshot())); } catch (e) {} }, 400);
+}
+$("btnSave").onclick = () => {
+  const a = document.createElement("a");
+  a.download = (S.name || "motif").replace(/[^\wàâäéèêëîïôöùûüç -]/gi, "") + ".mosaique.json";
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(snapshot(), null, 1)], { type: "application/json" }));
+  a.click();
+};
+$("inLoad").onchange = ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const d = JSON.parse(rd.result);
+      if (d.app !== "mosaique-cap555") throw 0;
+      pushUndo(); restore(d); applyStateToUI();
+    } catch (e) { alert("Ce fichier n’est pas un projet Mosaïque."); }
+  };
+  rd.readAsText(f);
+};
+$("projName").oninput = () => { S.name = $("projName").value; saveLocal(); };
+
+/* ---------- thème, onglets, démarrage ---------- */
+$("themeBtn").onclick = () => {
+  S.theme = (document.documentElement.dataset.theme === "dark") ? "light" : "dark";
+  applyTheme(); renderDraw(); renderChart(); saveLocal();
+};
+function applyTheme() {
+  const t = S.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.dataset.theme = t;
+  $("themeBtn").textContent = t === "dark" ? "☀️" : "🌙";
+}
+document.querySelectorAll("nav button").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+    document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.id === "tab-" + b.dataset.tab));
+    if (b.dataset.tab === "grille") renderChart();
+    if (b.dataset.tab === "dessin") renderDraw();
+  };
+});
+function applyStateToUI() {
+  $("projName").value = S.name;
+  $("inW").value = S.W; $("inH").value = S.H;
+  $("selVal").value = S.valMode; $("selTech").value = S.tech;
+  $("inMarker").value = S.marker;
+  $("inZoom").value = S.zoom;
+  applyTheme(); renderPens(); renderDraw(); saveLocal();
+}
+(function start() {
+  try {
+    const d = JSON.parse(localStorage.getItem(LS));
+    if (d && d.app === "mosaique-cap555") restore(d);
+  } catch (e) {}
+  if (!S.cells) S.cells = new Uint8Array(S.W * S.H);
+  if (!S.yarns) S.yarns = defaultYarns(S.H, "#f2ead8", "#d42a2a");
+  if (!S.penA) S.penA = S.yarns[0];
+  if (!S.penB) S.penB = S.yarns[1] || "#d42a2a";
+  applyStateToUI();
+})();
+window.__mosaique = { S, violations, autoFix, isX, isO, renderDraw, renderChart, runCheck, tint, yarnColor, coverColor, setZoom };
+</script>
+<script>
+// Service worker : permet l'installation sur téléphone et le hors-ligne.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(e){
+      console.warn('Service worker non enregistré :', e);
+    });
+  });
+}
+</script>
+</body>
+</html>

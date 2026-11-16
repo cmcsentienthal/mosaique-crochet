@@ -1,0 +1,33 @@
+{
+  "name": "Mosaïque — du dessin à la grille de crochet",
+  "short_name": "Mosaïque",
+  "description": "Dessiner un motif et obtenir la grille à suivre pour le crocheter en mosaïque. Les brides se placent toutes seules.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FAF5EA",
+  "theme_color": "#FAF5EA",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
